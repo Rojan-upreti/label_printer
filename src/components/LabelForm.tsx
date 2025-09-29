@@ -7,6 +7,7 @@ interface Product {
   "TJX Style #": string;
   "UPC": string;
   "Case Pack": number;
+  "Item Name": string;
 }
 
 interface LabelFormProps {
@@ -70,7 +71,7 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
         upc: selectedProduct["UPC"],
         mfgStyle: selectedProduct["TJX Style #"],
         casePack: selectedProduct["Case Pack"],
-        itemName: selectedProduct["Item Code"] // Use the item code as the item name
+        itemName: selectedProduct["Item Name"] // Use the actual item name from the product data
       }));
     }
   };
