@@ -17,7 +17,7 @@ interface LabelFormProps {
 const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
   const [poData, setPOData] = useState<PurchaseOrder>({
     customerPO: '',
-    fromLocation: 'Jodhpuri USA, Linden NJ, USA',
+    fromLocation: 'Jodhpuri USA, Edison NJ, USA',
     toLocation: '',
     items: []
   });
@@ -146,7 +146,7 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
     // Reset form
     setPOData({
       customerPO: '',
-      fromLocation: 'Jodhpuri USA, Linden NJ, USA',
+      fromLocation: 'Jodhpuri USA, Edison NJ, USA',
       toLocation: '',
       items: []
     });
