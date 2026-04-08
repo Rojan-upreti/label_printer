@@ -46,7 +46,7 @@
     "TJX Style #": "363987",
     "UPC": "682833500010",
     "Case Pack": 12,
-    "Item Name": "Coaster Soapstone Brown Galaxy 4Pc"
+    "Item Name": "Coaster ROUND BEIGE 4Pc"
   },
   {
     "Item Code": "50003",
@@ -82,5 +82,19 @@
     "UPC": "682833531557",
     "Case Pack": 12,
     "Item Name": "Coaster White Marble Slim Octagon"
+  },
+  {
+    "Item Code": "50529",
+    "TJX Style #": "020309",
+    "UPC": "682833505299",
+    "Case Pack": 12,
+    "Item Name": "Coaster Black Marble Round"
+  },
+  {
+    "Item Code": "53127",
+    "TJX Style #": "020312",
+    "UPC": "682833531274",
+    "Case Pack": 12,
+    "Item Name": "Coaster White Lady Square"
   }
 ]
