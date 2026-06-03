@@ -1,14 +1,39 @@
 import React, { useState } from 'react';
 import { POItem, PurchaseOrder } from '../types';
 import productData from '../../product.json';
+import {
+  parseBulkText,
+  validateBulkItem,
+  type ProductRecord,
+} from '../utils/bulkItems';
 
-interface Product {
-  "Item Code": string;
-  "TJX Style #": string;
-  "UPC": string;
-  "Case Pack": number;
-  "Item Name": string;
-}
+const products = productData as ProductRecord[];
+
+const emptyItem = (): POItem => ({
+  itemNumber: '',
+  itemName: '',
+  upc: '',
+  quantity: 0,
+  casePack: 0,
+  sku: '',
+  mfgStyle: '',
+  countryOfOrigin: 'India',
+});
+
+const itemFromProduct = (
+  product: ProductRecord,
+  quantity: number,
+  countryOfOrigin: string
+): POItem => ({
+  itemNumber: product['Item Code'],
+  itemName: product['Item Name'],
+  upc: product.UPC,
+  quantity,
+  casePack: product['Case Pack'],
+  sku: product['Item Code'],
+  mfgStyle: product['TJX Style #'],
+  countryOfOrigin,
+});
 
 interface LabelFormProps {
   onSubmit: (po: PurchaseOrder) => void;
@@ -34,16 +59,10 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
     '#890 – 8201 Oak Grove Road, Fort Worth, TX 76140'
   ];
 
-  const [currentItem, setCurrentItem] = useState<POItem>({
-    itemNumber: '',
-    itemName: '',
-    upc: '',
-    quantity: 0,
-    casePack: 0,
-    sku: '',
-    mfgStyle: '',
-    countryOfOrigin: 'India'
-  });
+  const [itemAddMode, setItemAddMode] = useState<'single' | 'bulk'>('single');
+  const [bulkText, setBulkText] = useState('');
+  const [bulkErrors, setBulkErrors] = useState<string[]>([]);
+  const [currentItem, setCurrentItem] = useState<POItem>(emptyItem());
 
   // Handle item selection from dropdown
   const handleItemSelection = (itemCode: string) => {
@@ -61,7 +80,7 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
       return;
     }
     
-    const selectedProduct = productData.find((product: Product) => product["Item Code"] === itemCode);
+    const selectedProduct = products.find((product) => product['Item Code'] === itemCode);
     
     if (selectedProduct) {
       setCurrentItem(prev => ({
@@ -110,16 +129,42 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
       items: [...prev.items, currentItem]
     }));
 
-    setCurrentItem({
-      itemNumber: '',
-      itemName: '',
-      upc: '',
-      quantity: 0,
-      casePack: 0,
-      sku: '',
-      mfgStyle: '',
-      countryOfOrigin: 'India'
+    setCurrentItem(emptyItem());
+  };
+
+  const addBulkItems = () => {
+    const { parsed, errors: parseErrors } = parseBulkText(bulkText);
+    const validationErrors: string[] = [...parseErrors];
+    const newItems: POItem[] = [];
+
+    parsed.forEach((row) => {
+      const err = validateBulkItem(row.itemCode, row.quantity, products);
+      if (err) {
+        validationErrors.push(err);
+        return;
+      }
+      const product = products.find((p) => p['Item Code'] === row.itemCode)!;
+      newItems.push(
+        itemFromProduct(product, row.quantity, currentItem.countryOfOrigin)
+      );
     });
+
+    if (validationErrors.length > 0) {
+      setBulkErrors(validationErrors);
+      return;
+    }
+
+    if (newItems.length === 0) {
+      setBulkErrors(['Enter at least one line (item number and quantity).']);
+      return;
+    }
+
+    setPOData((prev) => ({
+      ...prev,
+      items: [...prev.items, ...newItems],
+    }));
+    setBulkText('');
+    setBulkErrors([]);
   };
 
   const removeItem = (index: number) => {
@@ -213,7 +258,32 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
         {/* Add Item Section */}
         <div className="item-section">
           <h3>Add New Item to List</h3>
-          <p className="section-description">Fill in the details below and click "Add Item" to add it to your list</p>
+          <div className="add-mode-toggle">
+            <button
+              type="button"
+              className={`btn-mode ${itemAddMode === 'single' ? 'active' : ''}`}
+              onClick={() => {
+                setItemAddMode('single');
+                setBulkErrors([]);
+              }}
+            >
+              Single item
+            </button>
+            <button
+              type="button"
+              className={`btn-mode ${itemAddMode === 'bulk' ? 'active' : ''}`}
+              onClick={() => {
+                setItemAddMode('bulk');
+                setBulkErrors([]);
+              }}
+            >
+              Bulk add
+            </button>
+          </div>
+
+          {itemAddMode === 'single' ? (
+            <>
+          <p className="section-description">Select an item, enter quantity, and click Add Item.</p>
           <div className="form-grid">
             <div className="form-group">
               <label htmlFor="itemNumber">Item Number *</label>
@@ -224,9 +294,9 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
                 onChange={(e) => handleItemSelection(e.target.value)}
               >
                 <option value="">Select an item...</option>
-                {productData.map((product: Product) => (
-                  <option key={product["Item Code"]} value={product["Item Code"]}>
-                    {product["Item Code"]}
+                {products.map((product) => (
+                  <option key={product['Item Code']} value={product['Item Code']}>
+                    {product['Item Code']}
                   </option>
                 ))}
               </select>
@@ -321,6 +391,50 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
           <button type="button" onClick={addItem} className="btn btn-secondary">
             Add Item
           </button>
+            </>
+          ) : (
+            <>
+              <p className="section-description">
+                Paste one item per line. Use <code>item quantity</code> (e.g.{' '}
+                <code>50001 72</code>) or paste full rows from your shipment list.
+              </p>
+              <div className="form-group bulk-input-group">
+                <label htmlFor="bulkItems">Items (one per line)</label>
+                <textarea
+                  id="bulkItems"
+                  className="bulk-textarea"
+                  value={bulkText}
+                  onChange={(e) => {
+                    setBulkText(e.target.value);
+                    setBulkErrors([]);
+                  }}
+                  placeholder={`50001 72\n50003 624\n50483 EA 4PC Sqr Beige Marble Coaster Set 168 12 14`}
+                  rows={8}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="bulkCountryOfOrigin">Country of Origin (all bulk items)</label>
+                <input
+                  type="text"
+                  id="bulkCountryOfOrigin"
+                  name="countryOfOrigin"
+                  value={currentItem.countryOfOrigin}
+                  onChange={handleItemChange}
+                  placeholder="e.g., India"
+                />
+              </div>
+              {bulkErrors.length > 0 && (
+                <ul className="bulk-errors">
+                  {bulkErrors.map((err, i) => (
+                    <li key={i}>{err}</li>
+                  ))}
+                </ul>
+              )}
+              <button type="button" onClick={addBulkItems} className="btn btn-secondary">
+                Add All Items
+              </button>
+            </>
+          )}
         </div>
 
         {/* Items List */}
