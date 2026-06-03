@@ -11,7 +11,7 @@
     "TJX Style #": "363972",
     "UPC": "682833481197",
     "Case Pack": 12,
-    "Item Name": "Spoon Rest Lady Purple"
+    "Item Name": "Purple Lady Spoon Rest"
   },
   {
     "Item Code": "48101",
@@ -26,6 +26,13 @@
     "UPC": "682833481050",
     "Case Pack": 12,
     "Item Name": "Spoon Rest Black Marble"
+  },
+  {
+    "Item Code": "48107",
+    "TJX Style #": "063777",
+    "UPC": "682833481077",
+    "Case Pack": 12,
+    "Item Name": "Grey Marble Spoon Rest"
   },
   {
     "Item Code": "48103",
@@ -77,6 +84,13 @@
     "Item Name": "Coaster White Marble Round"
   },
   {
+    "Item Code": "50483",
+    "TJX Style #": "063754",
+    "UPC": "682833504837",
+    "Case Pack": 12,
+    "Item Name": "4PC Sqr Beige Marble Coaster Set"
+  },
+  {
     "Item Code": "53155",
     "TJX Style #": "364014",
     "UPC": "682833531557",
@@ -89,6 +103,13 @@
     "UPC": "682833505299",
     "Case Pack": 12,
     "Item Name": "Coaster Black Marble Round"
+  },
+  {
+    "Item Code": "50531",
+    "TJX Style #": "063762",
+    "UPC": "682833505317",
+    "Case Pack": 12,
+    "Item Name": "4PC Rnd White Lady Coaster Set"
   },
   {
     "Item Code": "53127",
