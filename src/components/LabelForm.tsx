@@ -395,8 +395,8 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
           ) : (
             <>
               <p className="section-description">
-                Paste one item per line. Use <code>item quantity</code> (e.g.{' '}
-                <code>50001 72</code>) or paste full rows from your shipment list.
+                Paste one item per line. Any item in the product list (same as the dropdown) works —
+                use <code>item quantity</code> (e.g. <code>73218 120</code>) or paste full shipment rows.
               </p>
               <div className="form-group bulk-input-group">
                 <label htmlFor="bulkItems">Items (one per line)</label>
@@ -408,7 +408,7 @@ const LabelForm: React.FC<LabelFormProps> = ({ onSubmit }) => {
                     setBulkText(e.target.value);
                     setBulkErrors([]);
                   }}
-                  placeholder={`50001 72\n50003 624\n50483 EA 4PC Sqr Beige Marble Coaster Set 168 12 14`}
+                  placeholder={`73218 120\n50001 72\n73218 EA Coaster Grey Marble Square 4 piece 168 12 14`}
                   rows={8}
                 />
               </div>
